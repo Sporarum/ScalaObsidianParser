@@ -109,6 +109,6 @@ def testParser[T](parser: P[?] ?=> P[T])(testCases: (String, T)*) =
 def testParse[T](s: String, parser: P[?] ?=> P[T], expected: T) =
   parse[T](s, parser(using _)) match
     case Success(got, index) =>
-      assert(got == expected)
+      assert(got == expected, s"got: $got, expected: $expected")
     case f@Failure(label, index, extra) =>
-      assert(false, f.msg)
+      assert(false, f.trace().longMsg)

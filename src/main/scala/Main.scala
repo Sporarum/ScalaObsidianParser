@@ -3,10 +3,21 @@ import fastparse.NoWhitespace.noWhitespaceImplicit
 import fastparse.Parsed.Success
 import fastparse.Parsed.Failure
 
+def simpleTag[$: P] = P( CharsWhileIn("a-zA-Z0-9_\\-", min = 1) )
+
+def tag[$: P]: P[Seq[String]] = P( "#" ~ simpleTag.!.rep(min = 1, sep = "/") )
+
 def parseA[$: P] = P("a")
 
 @main def hello(): Unit =
   testParse("a", parseA, ())
+
+  testParser(tag)(
+    ("#test", Seq("test")),
+    ("#test/moreSpecific", Seq("test", "moreSpecific")),
+    ("#a-b_cZZZ", Seq("a-b_cZZZ")),
+    ("#FolderNote", Seq("FolderNote"))
+  )
 
 
   /*

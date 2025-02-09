@@ -7,6 +7,12 @@ def simpleTag[$: P] = P( CharsWhileIn("a-zA-Z0-9_\\-", min = 1) )
 
 def tag[$: P]: P[Seq[String]] = P( "#" ~ simpleTag.!.rep(min = 1, sep = "/") )
 
+def noteName[$: P] = P( CharsWhileIn("a-zA-Z0-9_\\- ", min = 1) )
+
+def sectionName[$: P] = P( CharsWhileIn("a-zA-Z0-9_\\- ", min = 1) )
+
+def wikilink[$: P]: P[(Option[String], Option[String])] = P("[[" ~ noteName.!.? ~ ("#" ~ sectionName.!).? ~ "]]")
+
 def parseA[$: P] = P("a")
 
 @main def hello(): Unit =
@@ -19,6 +25,12 @@ def parseA[$: P] = P("a")
     ("#FolderNote", Seq("FolderNote"))
   )
 
+  testParser(wikilink)(
+    ("[[]]", (None, None)), // TODO: dubious
+    ("[[Master]]", (Some("Master"), None)),
+    ("[[Branches#openrazer]]", (Some("Branches"), Some("openrazer"))),
+  )
+  
 
   /*
   testParse("b", parseA, ())
